@@ -9,6 +9,7 @@ from urllib import urlencode
 from urlparse import parse_qsl
 import xbmcgui
 import xbmcplugin
+import urlresolver
 
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
@@ -21,7 +22,7 @@ _handle = int(sys.argv[1])
 # from some web-site or online service.
 VIDEOS = {'Animals': [{'name': 'Crab',
                        'thumb': 'http://www.vidsplay.com/vids/crab.jpg',
-                       'video': 'http://www.vidsplay.com/vids/crab.mp4',
+                       'video': 'https://www.youtube.com/watch?v=BeMBJTR3IUs',
                        'genre': 'Animals'},
                       {'name': 'Alligator',
                        'thumb': 'http://www.vidsplay.com/vids/alligator.jpg',
@@ -186,7 +187,7 @@ def play_video(path):
     :type path: str
     """
     # Create a playable item with a path to play.
-    play_item = xbmcgui.ListItem(path=path)
+    play_item = xbmcgui.ListItem(path=urlresolver.resolve(path))
     # Pass the item to the Kodi player.
     xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
 
