@@ -10,6 +10,7 @@ from urlparse import parse_qsl
 import xbmcgui
 import xbmcplugin
 import urlresolver
+import requests
 
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
@@ -33,32 +34,36 @@ VIDEOS = {'Animals': [{'name': 'Crab',
                        'video': 'http://www.vidsplay.com/vids/turtle.mp4',
                        'genre': 'Animals'}
                       ],
-            'Cars': [{'name': 'Postal Truck',
-                      'thumb': 'http://www.vidsplay.com/vids/us_postal.jpg',
-                      'video': 'http://www.vidsplay.com/vids/us_postal.mp4',
-                      'genre': 'Cars'},
-                     {'name': 'Traffic',
-                      'thumb': 'http://www.vidsplay.com/vids/traffic1.jpg',
-                      'video': 'http://www.vidsplay.com/vids/traffic1.avi',
-                      'genre': 'Cars'},
-                     {'name': 'Traffic Arrows',
-                      'thumb': 'http://www.vidsplay.com/vids/traffic_arrows.jpg',
-                      'video': 'http://www.vidsplay.com/vids/traffic_arrows.mp4',
-                      'genre': 'Cars'}
-                     ],
-            'Food': [{'name': 'Chicken',
-                      'thumb': 'http://www.vidsplay.com/vids/chicken.jpg',
-                      'video': 'http://www.vidsplay.com/vids/bbqchicken.mp4',
-                      'genre': 'Food'},
-                     {'name': 'Hamburger',
-                      'thumb': 'http://www.vidsplay.com/vids/hamburger.jpg',
-                      'video': 'http://www.vidsplay.com/vids/hamburger.mp4',
-                      'genre': 'Food'},
-                     {'name': 'Pizza',
-                      'thumb': 'http://www.vidsplay.com/vids/pizza.jpg',
-                      'video': 'http://www.vidsplay.com/vids/pizza.mp4',
-                      'genre': 'Food'}
-                     ]}
+          'Cars': [{'name': 'Postal Truck',
+                    'thumb': 'http://www.vidsplay.com/vids/us_postal.jpg',
+                    'video': 'http://www.vidsplay.com/vids/us_postal.mp4',
+                    'genre': 'Cars'},
+                   {'name': 'Traffic',
+                    'thumb': 'http://www.vidsplay.com/vids/traffic1.jpg',
+                    'video': 'http://www.vidsplay.com/vids/traffic1.avi',
+                    'genre': 'Cars'},
+                   {'name': 'Traffic Arrows',
+                    'thumb': 'http://www.vidsplay.com/vids/traffic_arrows.jpg',
+                    'video': 'http://www.vidsplay.com/vids/traffic_arrows.mp4',
+                    'genre': 'Cars'}
+                   ],
+          'Food': [{'name': 'Chicken',
+                    'thumb': 'http://www.vidsplay.com/vids/chicken.jpg',
+                    'video': 'http://www.vidsplay.com/vids/bbqchicken.mp4',
+                    'genre': 'Food'},
+                   {'name': 'Hamburger',
+                    'thumb': 'http://www.vidsplay.com/vids/hamburger.jpg',
+                    'video': 'http://www.vidsplay.com/vids/hamburger.mp4',
+                    'genre': 'Food'},
+                   {'name': 'Pizza',
+                    'thumb': 'http://www.vidsplay.com/vids/pizza.jpg',
+                    'video': 'http://www.vidsplay.com/vids/pizza.mp4',
+                    'genre': 'Food'}
+                   ]}
+
+
+def remove_non_ascii(text):
+    return ''.join([i if ord(i) < 128 else '' for i in text])
 
 
 def get_url(**kwargs):
@@ -87,7 +92,11 @@ def get_categories():
     :return: The list of video categories
     :rtype: list
     """
-    return VIDEOS.iterkeys()
+
+    resp = requests.get('https://www.crossroads.net/proxy/content/api/series')
+    data = resp.json()['series']
+    for series in data:
+        print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
 
 
 def get_videos(category):
@@ -131,13 +140,16 @@ def list_categories():
         # http://mirrors.xbmc.org/docs/python-docs/15.x-isengard/xbmcgui.html#ListItem-setInfo
         list_item.setInfo('video', {'title': category, 'genre': category})
         # Create a URL for a plugin recursive call.
-        # Example: plugin://plugin.video.example/?action=listing&category=Animals
+        # Example:
+        # plugin://plugin.video.example/?action=listing&category=Animals
         url = get_url(action='listing', category=category)
-        # is_folder = True means that this item opens a sub-list of lower level items.
+        # is_folder = True means that this item opens a sub-list of lower level
+        # items.
         is_folder = True
         # Add our item to the Kodi virtual folder listing.
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
-    # Add a sort method for the virtual folder items (alphabetically, ignore articles)
+    # Add a sort method for the virtual folder items (alphabetically, ignore
+    # articles)
     xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(_handle)
@@ -157,23 +169,27 @@ def list_videos(category):
         # Create a list item with a text label and a thumbnail image.
         list_item = xbmcgui.ListItem(label=video['name'])
         # Set additional info for the list item.
-        list_item.setInfo('video', {'title': video['name'], 'genre': video['genre']})
+        list_item.setInfo(
+            'video', {'title': video['name'], 'genre': video['genre']})
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
-        list_item.setArt({'thumb': video['thumb'], 'icon': video['thumb'], 'fanart': video['thumb']})
+        list_item.setArt({'thumb': video['thumb'], 'icon': video[
+                         'thumb'], 'fanart': video['thumb']})
         # Set 'IsPlayable' property to 'true'.
         # This is mandatory for playable items!
         list_item.setProperty('IsPlayable', 'true')
         # Create a URL for a plugin recursive call.
-        # Example: plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
+        # Example:
+        # plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
         url = get_url(action='play', video=video['video'])
         # Add the list item to a virtual Kodi folder.
         # is_folder = False means that this item won't open any sub-list.
         is_folder = False
         # Add our item to the Kodi virtual folder listing.
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
-    # Add a sort method for the virtual folder items (alphabetically, ignore articles)
+    # Add a sort method for the virtual folder items (alphabetically, ignore
+    # articles)
     xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(_handle)
@@ -224,5 +240,6 @@ def router(paramstring):
 
 if __name__ == '__main__':
     # Call the router function and pass the plugin call parameters to it.
-    # We use string slicing to trim the leading '?' from the plugin call paramstring
+    # We use string slicing to trim the leading '?' from the plugin call
+    # paramstring
     router(sys.argv[2][1:])

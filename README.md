@@ -1,4 +1,4 @@
-# Simple example plugin for Kodi mediacenter
+<!--# Simple example plugin for Kodi mediacenter
 
 This is a simple yet fully functional example of a video plugin for [Kodi](http://kodi.tv) mediacenter.
 Please read the comments in the plugin code for more details.
@@ -12,4 +12,4 @@ The plugin uses a pre-defined set of free sample videos from [www.vidsplay.com](
 
 **Warning**: the "master" branch is only compatible with Kody 16.0 (Jarvis) and above. For older versions see the "legacy" branch.
 
-License: [GPL v.3](http://www.gnu.org/copyleft/gpl.html)
+License: [GPL v.3](http://www.gnu.org/copyleft/gpl.html)-->
