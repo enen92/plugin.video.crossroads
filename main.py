@@ -19,15 +19,30 @@ import json
 _url = sys.argv[0]
 # Get the plugin handle as an integer number.
 _handle = int(sys.argv[1])
+# Streamspot
+_streamspot_url = 'https://api.streamspot.com/'
+_streamspot_api_key = 'a0cb38cb-8146-47c2-b11f-6d93f4647389'
+_streamspot_ssid = 'crossr30e3'
+_streamspot_header = {
+    "Content-Type": 'application/json',
+    "x-API-Key": _streamspot_api_key
+}
+
 
 
 def remove_non_ascii(text):
+    """
+    Removes non Ascii characters from a string
+    """
     return ''.join([i if ord(i) < 128 else '' for i in text])
 
 def cleanhtml(raw_html):
-  cleanr = re.compile('<.*?>')
-  cleantext = re.sub(cleanr, '', raw_html)
-  return cleantext
+    """
+    Turns HTML contents into just their strings
+    """
+    cleanr = re.compile('<.*?>')
+    cleantext = re.sub(cleanr, '', raw_html)
+    return cleantext
 
 
 def get_url(**kwargs):
@@ -62,6 +77,13 @@ def get_categories():
     #for series in data:
         #print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
     return data
+
+def get_live_streams():
+    """
+    Gets the list of current and upcoming live Streams
+    """
+    resp = requests.get("{}broadcaster/{}/events".format(_streamspot_url, _streamspot_ssid))
+    events = resp.json
 
 def show_main_menu():
     """
@@ -171,6 +193,12 @@ def list_videos(series):
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(_handle)
 
+def list_live_streams():
+    """
+    lists all current and upcoming streams
+    """
+
+
 
 def play_video(path):
     """
@@ -206,6 +234,8 @@ def router(paramstring):
             play_video(params['video'])
         elif params['action'] == 'historical':
             list_categories()
+        elif params['live'] == 'live':
+            list_live_streams()
         else:
             # If the provided paramstring does not contain a supported action
             # we raise an exception. This helps to catch coding errors,
