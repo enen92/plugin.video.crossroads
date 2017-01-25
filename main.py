@@ -11,6 +11,7 @@ import xbmcgui
 import xbmcplugin
 import urlresolver
 import requests
+import re
 
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
@@ -65,6 +66,11 @@ VIDEOS = {'Animals': [{'name': 'Crab',
 def remove_non_ascii(text):
     return ''.join([i if ord(i) < 128 else '' for i in text])
 
+def cleanhtml(raw_html):
+  cleanr = re.compile('<.*?>')
+  cleantext = re.sub(cleanr, '', raw_html)
+  return cleantext
+
 
 def get_url(**kwargs):
     """
@@ -95,8 +101,10 @@ def get_categories():
 
     resp = requests.get('https://www.crossroads.net/proxy/content/api/series')
     data = resp.json()['series']
-    for series in data:
-        print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
+    #for series in data:
+        #print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
+    VIDEOS = data
+    return data
 
 
 def get_videos(category):
@@ -125,24 +133,26 @@ def list_categories():
     categories = get_categories()
     # Iterate through categories
     for category in categories:
+        #print(category)
+        #print(category['image'])
         # Create a list item with a text label and a thumbnail image.
-        list_item = xbmcgui.ListItem(label=category)
+        list_item = xbmcgui.ListItem(label=category['title'])
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
-        list_item.setArt({'thumb': VIDEOS[category][0]['thumb'],
-                          'icon': VIDEOS[category][0]['thumb'],
-                          'fanart': VIDEOS[category][0]['thumb']})
+        list_item.setArt({'thumb': category['image']['filename'],
+                          'icon': category['image']['filename'],
+                          'fanart': category['image']['filename']})
         # Set additional info for the list item.
         # Here we use a category name for both properties for for simplicity's sake.
         # setInfo allows to set various information for an item.
         # For available properties see the following link:
         # http://mirrors.xbmc.org/docs/python-docs/15.x-isengard/xbmcgui.html#ListItem-setInfo
-        list_item.setInfo('video', {'title': category, 'genre': category})
+        list_item.setInfo('video', {'title': category['title'], 'trailer': category['trailerLink'], 'plot': cleanhtml(category['description']), 'dateadded': category['startDate'], 'year': category['startDate'][:4]})
         # Create a URL for a plugin recursive call.
         # Example:
         # plugin://plugin.video.example/?action=listing&category=Animals
-        url = get_url(action='listing', category=category)
+        url = get_url(action='listing', category=category['messages'])
         # is_folder = True means that this item opens a sub-list of lower level
         # items.
         is_folder = True
@@ -150,7 +160,7 @@ def list_categories():
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
     # Add a sort method for the virtual folder items (alphabetically, ignore
     # articles)
-    xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    #xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(_handle)
 
@@ -182,10 +192,11 @@ def list_videos(category):
         # Create a URL for a plugin recursive call.
         # Example:
         # plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
-        url = get_url(action='play', video=video['video'])
+        #url = get_url(action='play', video=category['video'])
+        url = '';
         # Add the list item to a virtual Kodi folder.
         # is_folder = False means that this item won't open any sub-list.
-        is_folder = False
+        is_folder = True
         # Add our item to the Kodi virtual folder listing.
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
     # Add a sort method for the virtual folder items (alphabetically, ignore
