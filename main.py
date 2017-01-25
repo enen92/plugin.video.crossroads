@@ -12,6 +12,7 @@ import xbmcplugin
 import urlresolver
 import requests
 import re
+import re
 
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
@@ -60,6 +61,23 @@ def get_categories():
     #for series in data:
         #print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
     return data
+
+def show_main_menu():
+    """
+    Create the initial interface for past or live series.
+    """
+    #Live
+    list_item_live = xbmcgui.ListItem(label='Live Streams')
+    list_item_live.setInfo('video', {'title': 'Live Streams'})
+    url_live = get_url(action='live')
+    xbmcplugin.addDirectoryItem(_handle, url_live, list_item_live, True)
+
+    #Historical
+    list_item_past = xbmcgui.ListItem(label='Past Series')
+    list_item_past.setInfo('video', {'title': 'Past Series'})
+    url_past = get_url(action='historical')
+    xbmcplugin.addDirectoryItem(_handle, url_past, list_item_past, True)
+    xbmcplugin.endOfDirectory(_handle)
 
 def list_categories():
     """
@@ -181,6 +199,8 @@ def router(paramstring):
         elif params['action'] == 'play':
             # Play a video from a provided URL.
             play_video(params['video'])
+        elif params['action'] == 'historical':
+            list_categories()
         else:
             # If the provided paramstring does not contain a supported action
             # we raise an exception. This helps to catch coding errors,
@@ -189,7 +209,7 @@ def router(paramstring):
     else:
         # If the plugin is called from Kodi UI without any parameters,
         # display the list of video categories
-        list_categories()
+        show_main_menu()
 
 
 if __name__ == '__main__':
