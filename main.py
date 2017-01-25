@@ -18,50 +18,6 @@ _url = sys.argv[0]
 # Get the plugin handle as an integer number.
 _handle = int(sys.argv[1])
 
-# Free sample videos are provided by www.vidsplay.com
-# Here we use a fixed set of properties simply for demonstrating purposes
-# In a "real life" plugin you will need to get info and links to video files/streams
-# from some web-site or online service.
-VIDEOS = {'Animals': [{'name': 'Crab',
-                       'thumb': 'http://www.vidsplay.com/vids/crab.jpg',
-                       'video': 'https://www.youtube.com/watch?v=BeMBJTR3IUs',
-                       'genre': 'Animals'},
-                      {'name': 'Alligator',
-                       'thumb': 'http://www.vidsplay.com/vids/alligator.jpg',
-                       'video': 'http://www.vidsplay.com/vids/alligator.mp4',
-                       'genre': 'Animals'},
-                      {'name': 'Turtle',
-                       'thumb': 'http://www.vidsplay.com/vids/turtle.jpg',
-                       'video': 'http://www.vidsplay.com/vids/turtle.mp4',
-                       'genre': 'Animals'}
-                      ],
-          'Cars': [{'name': 'Postal Truck',
-                    'thumb': 'http://www.vidsplay.com/vids/us_postal.jpg',
-                    'video': 'http://www.vidsplay.com/vids/us_postal.mp4',
-                    'genre': 'Cars'},
-                   {'name': 'Traffic',
-                    'thumb': 'http://www.vidsplay.com/vids/traffic1.jpg',
-                    'video': 'http://www.vidsplay.com/vids/traffic1.avi',
-                    'genre': 'Cars'},
-                   {'name': 'Traffic Arrows',
-                    'thumb': 'http://www.vidsplay.com/vids/traffic_arrows.jpg',
-                    'video': 'http://www.vidsplay.com/vids/traffic_arrows.mp4',
-                    'genre': 'Cars'}
-                   ],
-          'Food': [{'name': 'Chicken',
-                    'thumb': 'http://www.vidsplay.com/vids/chicken.jpg',
-                    'video': 'http://www.vidsplay.com/vids/bbqchicken.mp4',
-                    'genre': 'Food'},
-                   {'name': 'Hamburger',
-                    'thumb': 'http://www.vidsplay.com/vids/hamburger.jpg',
-                    'video': 'http://www.vidsplay.com/vids/hamburger.mp4',
-                    'genre': 'Food'},
-                   {'name': 'Pizza',
-                    'thumb': 'http://www.vidsplay.com/vids/pizza.jpg',
-                    'video': 'http://www.vidsplay.com/vids/pizza.mp4',
-                    'genre': 'Food'}
-                   ]}
-
 
 def remove_non_ascii(text):
     return ''.join([i if ord(i) < 128 else '' for i in text])
@@ -103,27 +59,7 @@ def get_categories():
     data = resp.json()['series']
     #for series in data:
         #print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
-    VIDEOS = data
     return data
-
-
-def get_videos(category):
-    """
-    Get the list of videofiles/streams.
-
-    Here you can insert some parsing code that retrieves
-    the list of video streams in the given category from some site or server.
-
-    .. note:: Consider using `generators functions <https://wiki.python.org/moin/Generators>`_
-        instead of returning lists.
-
-    :param category: Category name
-    :type category: str
-    :return: the list of videos in the category
-    :rtype: list
-    """
-    return VIDEOS[category]
-
 
 def list_categories():
     """
@@ -140,15 +76,20 @@ def list_categories():
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
-        # list_item.setArt({'thumb': category['image']['filename'],
-                        #   'icon': category['image']['filename'],
-                        #   'fanart': category['image']['filename']})
+        list_item.setArt({'thumb': category['image']['filename'],
+                          'icon': category['image']['filename'],
+                          'fanart': category['image']['filename']})
         # Set additional info for the list item.
         # Here we use a category name for both properties for for simplicity's sake.
         # setInfo allows to set various information for an item.
         # For available properties see the following link:
         # http://mirrors.xbmc.org/docs/python-docs/15.x-isengard/xbmcgui.html#ListItem-setInfo
-        list_item.setInfo('video', {'title': category['title'], 'trailer': category['trailerLink'], 'plot': cleanhtml(category['description']), 'dateadded': category['startDate'], 'year': category['startDate'][:4]})
+        list_item.setInfo('video',
+                          {'title': category['title'],
+                           'trailer': category['trailerLink'],
+                           'plot': cleanhtml(category['description']),
+                           'dateadded': category['startDate'],
+                           'year': category['startDate'][:4]})
         # Create a URL for a plugin recursive call.
         # Example:
         # plugin://plugin.video.example/?action=listing&category=Animals
@@ -165,22 +106,22 @@ def list_categories():
     xbmcplugin.endOfDirectory(_handle)
 
 
-def list_videos(category):
+def list_videos(messages):
     """
     Create the list of playable videos in the Kodi interface.
 
     :param category: Category name
     :type category: str
     """
-    # Get the list of videos in the category.
-    videos = get_videos(category)
+    print messages
     # Iterate through videos.
-    for video in videos:
+    for message in messages:
         # Create a list item with a text label and a thumbnail image.
-        list_item = xbmcgui.ListItem(label=video['name'])
+        print message
+        list_item = xbmcgui.ListItem(label=message['title'])
         # Set additional info for the list item.
         list_item.setInfo(
-            'video', {'title': video['title'], 'genre': 'message'})
+            'video', {'title': message['title'], 'genre': 'message'})
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
@@ -192,8 +133,10 @@ def list_videos(category):
         # Create a URL for a plugin recursive call.
         # Example:
         # plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
-        #url = get_url(action='play', video=category['video'])
-        url = '';
+        url = get_url(action='play',
+                      video="{}{}".format("https://www.youtube.com/watch?v=",
+                                          message['messageVideo.serviceId']))
+        #url = ''
         # Add the list item to a virtual Kodi folder.
         # is_folder = False means that this item won't open any sub-list.
         is_folder = True
