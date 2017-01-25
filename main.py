@@ -12,6 +12,8 @@ import xbmcplugin
 import urlresolver
 import requests
 import re
+import ast
+import json
 
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
@@ -84,6 +86,8 @@ def list_categories():
         # setInfo allows to set various information for an item.
         # For available properties see the following link:
         # http://mirrors.xbmc.org/docs/python-docs/15.x-isengard/xbmcgui.html#ListItem-setInfo
+
+        print category['trailerLink']
         list_item.setInfo('video',
                           {'title': category['title'],
                            'trailer': category['trailerLink'],
@@ -93,7 +97,7 @@ def list_categories():
         # Create a URL for a plugin recursive call.
         # Example:
         # plugin://plugin.video.example/?action=listing&category=Animals
-        url = get_url(action='listing', category=category['messages'])
+        url = get_url(action='listing', series=category)
         # is_folder = True means that this item opens a sub-list of lower level
         # items.
         is_folder = True
@@ -106,16 +110,17 @@ def list_categories():
     xbmcplugin.endOfDirectory(_handle)
 
 
-def list_videos(messages):
+def list_videos(series):
     """
     Create the list of playable videos in the Kodi interface.
-
-    :param category: Category name
-    :type category: str
+    :param messages: Array of messages
+    :type messages: json
     """
-    print messages
+    #print series
+    series = ast.literal_eval(cleanhtml(series).replace('u\'', '\''))
+
     # Iterate through videos.
-    for message in messages:
+    for message in series['messages']:
         # Create a list item with a text label and a thumbnail image.
         print message
         list_item = xbmcgui.ListItem(label=message['title'])
@@ -125,8 +130,9 @@ def list_videos(messages):
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
-        #list_item.setArt({'thumb': video['thumb'], 'icon': video[
-        #                 'thumb'], 'fanart': video['thumb']})
+        list_item.setArt({'thumb': message['messageVideo']['still']['filename'],
+                          'icon': message['messageVideo']['still']['filename'],
+                          'fanart': series['image']['filename']})
         # Set 'IsPlayable' property to 'true'.
         # This is mandatory for playable items!
         list_item.setProperty('IsPlayable', 'true')
@@ -135,11 +141,11 @@ def list_videos(messages):
         # plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
         url = get_url(action='play',
                       video="{}{}".format("https://www.youtube.com/watch?v=",
-                                          message['messageVideo.serviceId']))
+                                          message['messageVideo']['serviceId']))
         #url = ''
         # Add the list item to a virtual Kodi folder.
         # is_folder = False means that this item won't open any sub-list.
-        is_folder = True
+        is_folder = False
         # Add our item to the Kodi virtual folder listing.
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
     # Add a sort method for the virtual folder items (alphabetically, ignore
@@ -177,7 +183,7 @@ def router(paramstring):
     if params:
         if params['action'] == 'listing':
             # Display the list of videos in a provided category.
-            list_videos(params['category'])
+            list_videos(params['series'])
         elif params['action'] == 'play':
             # Play a video from a provided URL.
             play_video(params['video'])
