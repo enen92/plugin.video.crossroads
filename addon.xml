@@ -6,7 +6,7 @@ provider-name="CRDS">
 <requires>
   <import addon="xbmc.python" version="2.24.0"/>
   <import addon="script.module.urlresolver" version="3.0.0" />
-  <import addon="script.module.metahandler" version="1.0.0" />
+  <import addon="script.module.requests" version="2.7.0" />
 </requires>
 <extension point="xbmc.python.pluginsource" library="main.py">
   <provides>video</provides>

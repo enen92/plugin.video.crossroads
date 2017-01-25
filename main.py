@@ -140,9 +140,9 @@ def list_categories():
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
-        list_item.setArt({'thumb': category['image']['filename'],
-                          'icon': category['image']['filename'],
-                          'fanart': category['image']['filename']})
+        # list_item.setArt({'thumb': category['image']['filename'],
+                        #   'icon': category['image']['filename'],
+                        #   'fanart': category['image']['filename']})
         # Set additional info for the list item.
         # Here we use a category name for both properties for for simplicity's sake.
         # setInfo allows to set various information for an item.
@@ -180,12 +180,12 @@ def list_videos(category):
         list_item = xbmcgui.ListItem(label=video['name'])
         # Set additional info for the list item.
         list_item.setInfo(
-            'video', {'title': video['name'], 'genre': video['genre']})
+            'video', {'title': video['title'], 'genre': 'message'})
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
-        list_item.setArt({'thumb': video['thumb'], 'icon': video[
-                         'thumb'], 'fanart': video['thumb']})
+        #list_item.setArt({'thumb': video['thumb'], 'icon': video[
+        #                 'thumb'], 'fanart': video['thumb']})
         # Set 'IsPlayable' property to 'true'.
         # This is mandatory for playable items!
         list_item.setProperty('IsPlayable', 'true')
