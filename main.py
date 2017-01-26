@@ -161,7 +161,6 @@ def list_videos(series):
     # Iterate through videos.
     for message in series['messages']:
         # Create a list item with a text label and a thumbnail image.
-        print message
         list_item = xbmcgui.ListItem(label=message['title'])
         # Set additional info for the list item.
         list_item.setInfo(
@@ -169,8 +168,13 @@ def list_videos(series):
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
-        list_item.setArt({'thumb': message['messageVideo']['still']['filename'],
-                          'icon': message['messageVideo']['still']['filename'],
+        if 'messageVideo' in message and 'still' in message['messageVideo']:
+            imagesrc = message['messageVideo']['still']['filename']
+        else:
+            imagesrc = series['image']['filename']
+
+        list_item.setArt({'thumb': imagesrc,
+                          'icon': imagesrc,
                           'fanart': series['image']['filename']})
         # Set 'IsPlayable' property to 'true'.
         # This is mandatory for playable items!
@@ -178,9 +182,14 @@ def list_videos(series):
         # Create a URL for a plugin recursive call.
         # Example:
         # plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
+        if 'messageVideo' in message and 'serviceId' in message['messageVideo']:
+            vidurl = message['messageVideo']['serviceId']
+        else:
+            vidurl = ""
+
         url = get_url(action='play',
                       video="{}{}".format("https://www.youtube.com/watch?v=",
-                                          message['messageVideo']['serviceId']))
+                                          vidurl))
         #url = ''
         # Add the list item to a virtual Kodi folder.
         # is_folder = False means that this item won't open any sub-list.
