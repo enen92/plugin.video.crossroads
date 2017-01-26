@@ -74,9 +74,20 @@ def get_categories():
 
     resp = requests.get('https://www.crossroads.net/proxy/content/api/series')
     data = resp.json()['series']
+    data = filter(filter_series_with_no_videos, data)
     #for series in data:
         #print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
     return data
+
+def filter_series_with_no_videos(series):
+    """
+    Filter out series that do not have any playable media
+    """
+    for event in series['messages']:
+        if 'messageVideo' in event and event['messageVideo']['serviceId'] is not None:
+            return True
+    else:
+        return False
 
 def get_live_streams():
     """
