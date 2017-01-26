@@ -16,11 +16,12 @@ provider-name="CRDS">
 <extension point="xbmc.addon.metadata">
   <summary lang="en">Crossroads Church Stream Addon</summary>
   <description lang="en">This plug provides access to live crossroads streams and past services.</description>
-  <disclaimer lang="en"></disclaimer>
+  <disclaimer lang="en">This addon is supported by crds volunteers</disclaimer>
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
   </assets>
-  <news>Updated with latest artwork metadata</news>
+  <news>v1.0.0  (2017-1-27)
+- First version of Crossroads Stream Addon!</news>
 </extension>
 </addon>
