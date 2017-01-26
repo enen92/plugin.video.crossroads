@@ -164,7 +164,7 @@ def list_videos(series):
         list_item = xbmcgui.ListItem(label=message['title'])
         # Set additional info for the list item.
         list_item.setInfo(
-            'video', {'title': message['title'], 'genre': 'message'})
+            'video', {'title': message['title'], 'genre': 'message', 'plot': message['description']})
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
