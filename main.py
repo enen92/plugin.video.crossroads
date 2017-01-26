@@ -126,7 +126,6 @@ def list_categories():
         # For available properties see the following link:
         # http://mirrors.xbmc.org/docs/python-docs/15.x-isengard/xbmcgui.html#ListItem-setInfo
 
-        print category['trailerLink']
         list_item.setInfo('video',
                           {'title': category['title'],
                            'trailer': category['trailerLink'],
@@ -140,6 +139,10 @@ def list_categories():
         # is_folder = True means that this item opens a sub-list of lower level
         # items.
         is_folder = True
+        # Add context Menu Option 
+        if category['trailerLink'] != None:
+            traileurl = urlresolver.resolve(category['trailerLink'])
+            list_item.addContextMenuItems([('Play Trailer', 'PlayMedia(' + traileurl + ')')])
         # Add our item to the Kodi virtual folder listing.
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
     # Add a sort method for the virtual folder items (alphabetically, ignore
