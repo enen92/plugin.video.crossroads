@@ -1,7 +1,7 @@
 # -*- coding: utf-8 -*-
 # Module: default
-# Author: Roman V. M.
-# Created on: 28.11.2014
+# Author: Doug Shannon, Chris Andrews, and Joe Kerstanoff based off sample plugin by Roman V. M.
+# Created on: 26.1.2017
 # License: GPL v.3 https://www.gnu.org/copyleft/gpl.html
 
 import sys
@@ -59,12 +59,7 @@ def get_url(**kwargs):
 
 def get_categories():
     """
-    Get the list of video categories.
-
-    Here you can insert some parsing code that retrieves
-    the list of video categories (e.g. 'Movies', 'TV-shows', 'Documentaries' etc.)
-    from some site or server.
-
+    Get the list of video series.
     .. note:: Consider using `generator functions <https://wiki.python.org/moin/Generators>`_
         instead of returning lists.
 
@@ -123,20 +118,13 @@ def list_categories():
     categories = get_categories()
     # Iterate through categories
     for category in categories:
-        # print(category)
-        # print(category['image'])
         # Create a list item with a text label and a thumbnail image.
         list_item = xbmcgui.ListItem(label=category['title'])
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
-        # Here we use the same image for all items for simplicity's sake.
-        # In a real-life plugin you need to set each image accordingly.
         list_item.setArt({'thumb': category['image']['filename'],
                           'icon': category['image']['filename'],
                           'fanart': category['image']['filename']})
         # Set additional info for the list item.
-        # Here we use a category name for both properties for for simplicity's sake.
-        # setInfo allows to set various information for an item.
-        # For available properties see the following link:
         # http://mirrors.xbmc.org/docs/python-docs/15.x-isengard/xbmcgui.html#ListItem-setInfo
 
         list_item.setInfo('video',
@@ -150,9 +138,8 @@ def list_categories():
         # plugin://plugin.video.example/?action=listing&category=Animals
         url = get_url(action='listing', series=category)
         # is_folder = True means that this item opens a sub-list of lower level
-        # items.
         is_folder = True
-        # Add context Menu Option
+        # Add context Menu Option for trailer if it exists
         if category['trailerLink'] != None:
             traileurl = urlresolver.resolve(category['trailerLink'])
             list_item.addContextMenuItems([('Play Trailer', 'PlayMedia(' + traileurl + ')')])
@@ -182,8 +169,6 @@ def list_videos(series):
                           {'title': message['title'],
                            'genre': 'message', 'plot': message['description']})
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
-        # Here we use the same image for all items for simplicity's sake.
-        # In a real-life plugin you need to set each image accordingly.
         if 'messageVideo' in message and 'still' in message['messageVideo']:
             imagesrc = message['messageVideo']['still']['filename']
         else:
@@ -206,7 +191,6 @@ def list_videos(series):
         url = get_url(action='play',
                       video="{}{}".format("https://www.youtube.com/watch?v=",
                                           vidurl))
-        #url = ''
         # Add the list item to a virtual Kodi folder.
         # is_folder = False means that this item won't open any sub-list.
         is_folder = False
@@ -217,50 +201,6 @@ def list_videos(series):
     xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(_handle)
-
-
-# def list_live_streams():
-#     """
-#     lists all current and upcoming streams
-#     """
-#     streamlist = get_upcoming_streams()
-
-#     for stream in streamlist:
-#         print stream
-#         if stream['upcoming']:
-#             stream['title'] = stream['title'] + ' - live on DATE'
-#         if stream['live']:
-#             stream['title'] = stream['title'] + ' - LIVE NOW'
-#         list_item = xbmcgui.ListItem(label=stream['title'])
-#         # Set additional info for the list item.
-#         list_item.setInfo(
-#             'video', {'title': stream['title'], 'genre': 'live stream'})
-#         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
-#         # Here we use the same image for all items for simplicity's sake.
-#         # In a real-life plugin you need to set each image accordingly.
-#         # list_item.setArt({'thumb': message['messageVideo']['still']['filename'],
-#         #                   'icon': message['messageVideo']['still']['filename'],
-#         #                   'fanart': series['image']['filename']})
-#         # Set 'IsPlayable' property to 'true'.
-#         # This is mandatory for playable items!
-#         list_item.setProperty('IsPlayable', 'true')
-#         # Create a URL for a plugin recursive call.
-#         # Example:
-#         # plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
-#         url = get_url(action='play',
-#                       video='https://player2.streamspot.com/?playerId=2887fba1')
-#         #url = ''
-#         # Add the list item to a virtual Kodi folder.
-#         # is_folder = False means that this item won't open any sub-list.
-#         is_folder = False
-#         # Add our item to the Kodi virtual folder listing.
-#         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
-#     # Add a sort method for the virtual folder items (alphabetically, ignore
-#     # articles)
-#     xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
-#     # Finish creating a virtual folder.
-#     xbmcplugin.endOfDirectory(_handle)
-
 
 def play_video(path):
     """
@@ -287,14 +227,14 @@ def router(paramstring):
     :param paramstring: URL encoded plugin paramstring
     :type paramstring: str
     """
-    
+
     # Parse a URL-encoded paramstring to the dictionary of
     # {<parameter>: <value>} elements
     params = dict(parse_qsl(paramstring))
     # Check the parameters passed to the plugin
     if params:
         if params['action'] == 'listing':
-            # Display the list of videos in a provided category.
+            # Display the list of videos in a provided series.
             list_videos(params['series'])
         elif params['action'] == 'play':
             # Play a video from a provided URL.
