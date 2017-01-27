@@ -15,6 +15,13 @@ import re
 import ast
 import json
 
+# imports caching to SQLite cache database for function calls
+try:
+    import StorageServer
+except:
+    import storageserverdummy as StorageServer
+cache = StorageServer.StorageServer("crossroads", 1)
+
 # Get the plugin url in plugin:// notation.
 _url = sys.argv[0]
 # Get the plugin handle as an integer number.
@@ -118,7 +125,7 @@ def list_categories():
     Create the list of video categories in the Kodi interface.
     """
     # Get video categories
-    categories = get_categories()
+    categories = cache.cacheFunction(get_categories)
     # Iterate through categories
     for category in categories:
         #print(category)
