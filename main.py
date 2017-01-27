@@ -107,8 +107,10 @@ def show_main_menu():
 
     if broadcaster['isBroadcasting']:
         # Live
-        list_item_live = xbmcgui.ListItem(label='STREAMING NOW!')
-        list_item_live.setInfo('video', {'title': 'STREAMING NOW!', 'plot': 'This is a Crossroads service now streaming!'})
+        list_item_live = xbmcgui.ListItem(label='Watch live stream now')
+        list_item_live.setInfo('video', {'title': 'Watch live stream now', 'plot': """Live Streams:
+SAT 4:30 & 6:15pm 
+SUN 8:30, 10:05 & 11:55am (EST)"""})
         list_item_live.setArt({'thumb': liveicon,
                                'icon': liveicon,
                                'fanart': fanart})
@@ -117,7 +119,7 @@ def show_main_menu():
 
     # Historical
     list_item_past = xbmcgui.ListItem(label='Past Series')
-    list_item_past.setInfo('video', {'title': 'Past Series', 'plot': 'Watch our previous series broadcasts'})
+    list_item_past.setInfo('video', {'title': 'Past Series', 'plot': 'Watch our previous weekend messages'})
     list_item_past.setArt({'thumb': pastseries,
                            'icon': pastseries,
                            'fanart': fanart})
