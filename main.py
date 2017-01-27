@@ -152,7 +152,7 @@ def list_categories():
         # is_folder = True means that this item opens a sub-list of lower level
         # items.
         is_folder = True
-        # Add context Menu Option 
+        # Add context Menu Option
         if category['trailerLink'] != None:
             traileurl = urlresolver.resolve(category['trailerLink'])
             list_item.addContextMenuItems([('Play Trailer', 'PlayMedia(' + traileurl + ')')])
@@ -171,7 +171,7 @@ def list_videos(series):
     :param messages: Array of messages
     :type messages: json
     """
-    # print series
+    series = ast.literal_eval(cleanhtml(series).replace('u\'', '\''))
 
     # Iterate through videos.
     for message in series['messages']:
@@ -274,7 +274,7 @@ def play_video(path):
         xbmc.Player().play(path)
     else:
         # Create a playable item with a path to play.
-        play_item = xbmcgui.ListItem(path=path)
+        play_item = xbmcgui.ListItem(path=urlresolver.resolve(path))
         # Pass the item to the Kodi player.
         xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
 
