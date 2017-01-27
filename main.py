@@ -15,6 +15,13 @@ import requests
 import re
 import ast
 
+# imports caching to SQLite cache database for function calls
+try:
+    import StorageServer
+except:
+    import storageserverdummy as StorageServer
+cache = StorageServer.StorageServer("crossroads", 1)
+
 # Streamspot
 _streamspot_url = 'https://api.streamspot.com/'
 _streamspot_api_key = 'a0cb38cb-8146-47c2-b11f-6d93f4647389'
@@ -34,7 +41,6 @@ def remove_non_ascii(text):
     Removes non Ascii characters from a string
     """
     return ''.join([i if ord(i) < 128 else '' for i in text])
-
 
 def cleanhtml(raw_html):
     """
@@ -115,7 +121,7 @@ def list_categories():
     Create the list of video categories in the Kodi interface.
     """
     # Get video categories
-    categories = get_categories()
+    categories = cache.cacheFunction(get_categories)
     # Iterate through categories
     for category in categories:
         # Create a list item with a text label and a thumbnail image.
