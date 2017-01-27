@@ -21,6 +21,10 @@ We started this church for our friends who didn't like church.
 Crossroads is for anyone who wants to seek God-from those exploring whether or not God even exists, to committed Christ-followers. 
 We present biblical truths and show how they apply to our everyday lives. And we have a lot of fun while doing it.</description>
   <disclaimer lang="en">This addon is supported by crds volunteers</disclaimer>
+  <license>BSD 3-Clause License</license>
+  <website>https://www.crossroads.net</website>
+  <email>support@crossroads.net</email>
+  <source>https://github.com/crdschurch/plugin.video.crossroads</source>
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
