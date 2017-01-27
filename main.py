@@ -28,19 +28,6 @@ _url = sys.argv[0]
 # Get the plugin handle as an integer number.
 _handle = int(sys.argv[1])
 
-# def is_upcoming(event):
-#     print event['start']
-#     print event['end']
-#     print _now
-#     return datetime.datetime.strptime(event['start'], "%Y-%m-%d %H:%M:%S") > _now
-
-# def is_broadcasting(event):
-#     print event['start']
-#     print event['end']
-#     print _now
-#     return datetime.datetime.strptime(event['start'], "%Y-%m-%d %H:%M:%S") < _now and datetime.datetime.strptime(event['end'], "%Y-%m-%d %H:%M:%S") > _now
-
-
 def remove_non_ascii(text):
     """
     Removes non Ascii characters from a string
@@ -86,8 +73,7 @@ def get_categories():
 
     resp = requests.get('https://www.crossroads.net/proxy/content/api/series')
     data = resp.json()['series']
-    # for series in data:
-    #print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
+    data = filter(filter_series_with_no_videos, data)
     return data
 
 def get_broadcaster():
@@ -96,6 +82,17 @@ def get_broadcaster():
 
 def get_broadcaster_stream_link(broadcaster):
     return broadcaster['live_src']['hls']
+    
+
+def filter_series_with_no_videos(series):
+    """
+    Filter out series that do not have any playable media
+    """
+    for event in series['messages']:
+        if 'messageVideo' in event and event['messageVideo']['serviceId'] is not None:
+            return True
+    else:
+        return False
 
 def show_main_menu():
     """
@@ -142,7 +139,6 @@ def list_categories():
         # For available properties see the following link:
         # http://mirrors.xbmc.org/docs/python-docs/15.x-isengard/xbmcgui.html#ListItem-setInfo
 
-        print category['trailerLink']
         list_item.setInfo('video',
                           {'title': category['title'],
                            'trailer': category['trailerLink'],
@@ -156,6 +152,10 @@ def list_categories():
         # is_folder = True means that this item opens a sub-list of lower level
         # items.
         is_folder = True
+        # Add context Menu Option 
+        if category['trailerLink'] != None:
+            traileurl = urlresolver.resolve(category['trailerLink'])
+            list_item.addContextMenuItems([('Play Trailer', 'PlayMedia(' + traileurl + ')')])
         # Add our item to the Kodi virtual folder listing.
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
     # Add a sort method for the virtual folder items (alphabetically, ignore
@@ -176,16 +176,20 @@ def list_videos(series):
     # Iterate through videos.
     for message in series['messages']:
         # Create a list item with a text label and a thumbnail image.
-        print message
         list_item = xbmcgui.ListItem(label=message['title'])
         # Set additional info for the list item.
         list_item.setInfo(
-            'video', {'title': message['title'], 'genre': 'message'})
+            'video', {'title': message['title'], 'genre': 'message', 'plot': message['description']})
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
-        list_item.setArt({'thumb': message['messageVideo']['still']['filename'],
-                          'icon': message['messageVideo']['still']['filename'],
+        if 'messageVideo' in message and 'still' in message['messageVideo']:
+            imagesrc = message['messageVideo']['still']['filename']
+        else:
+            imagesrc = series['image']['filename']
+
+        list_item.setArt({'thumb': imagesrc,
+                          'icon': imagesrc,
                           'fanart': series['image']['filename']})
         # Set 'IsPlayable' property to 'true'.
         # This is mandatory for playable items!
@@ -193,9 +197,14 @@ def list_videos(series):
         # Create a URL for a plugin recursive call.
         # Example:
         # plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
+        if 'messageVideo' in message and 'serviceId' in message['messageVideo']:
+            vidurl = message['messageVideo']['serviceId']
+        else:
+            vidurl = ""
+
         url = get_url(action='play',
                       video="{}{}".format("https://www.youtube.com/watch?v=",
-                                          message['messageVideo']['serviceId']))
+                                          vidurl))
         #url = ''
         # Add the list item to a virtual Kodi folder.
         # is_folder = False means that this item won't open any sub-list.

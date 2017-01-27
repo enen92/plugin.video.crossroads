@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<addon id="plugin.crds.stream"
+<addon id="plugin.video.crds"
 version="1.0.0"
 name="Crossroads Church Stream Addon"
 provider-name="CRDS">
@@ -8,6 +8,7 @@ provider-name="CRDS">
   <import addon="script.module.urlresolver" version="3.0.0" />
   <import addon="script.module.metahandler" version="1.0.0" />
   <import addon="script.module.requests" version="2.7.0" />
+  <import addon="plugin.video.youtube" version="5.3.6"/>
 </requires>
 <extension point="xbmc.python.pluginsource" library="main.py">
   <provides>video</provides>
@@ -15,14 +16,12 @@ provider-name="CRDS">
 <extension point="xbmc.addon.metadata">
   <summary lang="en">Crossroads Church Stream Addon</summary>
   <description lang="en">This plug provides access to live crossroads streams and past services.</description>
-  <disclaimer lang="en"></disclaimer>
+  <disclaimer lang="en">This addon is supported by crds volunteers</disclaimer>
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
-    <screenshot>resources\screenshot-01.jpg</screenshot>
-    <screenshot>resources\screenshot-02.jpg</screenshot>
-    <screenshot>resources\screenshot-03.jpg</screenshot>    
   </assets>
-  <news>Updated with latest artwork metadata</news>
+  <news>v1.0.0  (2017-1-27)
+- First version of Crossroads Stream Addon!</news>
 </extension>
 </addon>
