@@ -24,6 +24,11 @@ provider-name="CRDS">
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
+    <icon>resources\pastseries.png</icon>
+    <icon>resources\streaming.png</icon>
+    <screenshot>resources\screenshot-01.jpg</screenshot>
+    <screenshot>resources\screenshot-02.jpg</screenshot>
+    <screenshot>resources\screenshot-03.jpg</screenshot>  
   </assets>
   <news>v1.0.0  (2017-1-27)
 - First version of Crossroads Stream Addon!</news>

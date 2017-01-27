@@ -10,6 +10,7 @@ from urlparse import parse_qsl
 import xbmc
 import xbmcgui
 import xbmcplugin
+import os
 import urlresolver
 import requests
 import re
@@ -100,17 +101,26 @@ def show_main_menu():
     Create the initial interface for past or live series.
     """
     broadcaster = get_broadcaster()
+    liveicon = os.path.join(os.path.dirname(__file__), 'resources', 'media', 'streaming.png')
+    pastseries = os.path.join(os.path.dirname(__file__), 'resources', 'media', 'pastseries.png')
 
     if broadcaster['isBroadcasting']:
         # Live
         list_item_live = xbmcgui.ListItem(label='STREAMING NOW!')
         list_item_live.setInfo('video', {'title': 'STREAMING NOW!'})
+        list_item_live.setArt({'thumb': liveicon,
+                               'icon': liveicon,
+                               'fanart': 'fanart.jpg'})
         url_live = get_url(action='play', video=get_broadcaster_stream_link(broadcaster))
         xbmcplugin.addDirectoryItem(_handle, url_live, list_item_live, False)
 
     # Historical
     list_item_past = xbmcgui.ListItem(label='Past Series')
     list_item_past.setInfo('video', {'title': 'Past Series'})
+    list_item_past.setArt({'thumb': pastseries,
+                           'icon': pastseries,
+                           'fanart': 'fanart.jpg'})
+
     url_past = get_url(action='historical')
     xbmcplugin.addDirectoryItem(_handle, url_past, list_item_past, True)
     xbmcplugin.endOfDirectory(_handle)
