@@ -24,8 +24,8 @@ provider-name="CRDS">
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
-    <icon>resources\pastseries.png</icon>
-    <icon>resources\streaming.png</icon>
+    <icon>resources\media\pastseries.png</icon>
+    <icon>resources\media\streaming.png</icon>
     <screenshot>resources\screenshot-01.jpg</screenshot>
     <screenshot>resources\screenshot-02.jpg</screenshot>
     <screenshot>resources\screenshot-03.jpg</screenshot>  
