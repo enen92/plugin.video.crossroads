@@ -7,6 +7,7 @@
 import sys
 from urllib import urlencode
 from urlparse import parse_qsl
+import xbmc
 import xbmcgui
 import xbmcplugin
 import urlresolver
@@ -82,7 +83,6 @@ def get_broadcaster():
 
 def get_broadcaster_stream_link(broadcaster):
     return broadcaster['live_src']['hls']
-    
 
 def filter_series_with_no_videos(series):
     """
@@ -178,8 +178,9 @@ def list_videos(series):
         # Create a list item with a text label and a thumbnail image.
         list_item = xbmcgui.ListItem(label=message['title'])
         # Set additional info for the list item.
-        list_item.setInfo(
-            'video', {'title': message['title'], 'genre': 'message', 'plot': message['description']})
+        list_item.setInfo('video',
+                          {'title': message['title'],
+                           'genre': 'message', 'plot': message['description']})
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         # Here we use the same image for all items for simplicity's sake.
         # In a real-life plugin you need to set each image accordingly.
@@ -268,12 +269,14 @@ def play_video(path):
     :param path: Fully-qualified video URL
     :type path: str
     """
-    
-    print 'playyyyyying now'
-    # Create a playable item with a path to play.
-    play_item = xbmcgui.ListItem(path=path)
-    # Pass the item to the Kodi player.
-    xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
+
+    if path[-4:] == 'm3u8':
+        xbmc.Player().play(path)
+    else:
+        # Create a playable item with a path to play.
+        play_item = xbmcgui.ListItem(path=path)
+        # Pass the item to the Kodi player.
+        xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
 
 
 def router(paramstring):
