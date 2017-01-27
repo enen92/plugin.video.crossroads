@@ -13,12 +13,7 @@ import urlresolver
 import requests
 import re
 import ast
-import json
 
-# Get the plugin url in plugin:// notation.
-_url = sys.argv[0]
-# Get the plugin handle as an integer number.
-_handle = int(sys.argv[1])
 # Streamspot
 _streamspot_url = 'https://api.streamspot.com/'
 _streamspot_api_key = 'a0cb38cb-8146-47c2-b11f-6d93f4647389'
@@ -27,7 +22,23 @@ _streamspot_header = {
     "Content-Type": 'application/json',
     "x-API-Key": _streamspot_api_key
 }
+_streamspot_player = '2887fba1'
+# Get the plugin url in plugin:// notation.
+_url = sys.argv[0]
+# Get the plugin handle as an integer number.
+_handle = int(sys.argv[1])
 
+# def is_upcoming(event):
+#     print event['start']
+#     print event['end']
+#     print _now
+#     return datetime.datetime.strptime(event['start'], "%Y-%m-%d %H:%M:%S") > _now
+
+# def is_broadcasting(event):
+#     print event['start']
+#     print event['end']
+#     print _now
+#     return datetime.datetime.strptime(event['start'], "%Y-%m-%d %H:%M:%S") < _now and datetime.datetime.strptime(event['end'], "%Y-%m-%d %H:%M:%S") > _now
 
 
 def remove_non_ascii(text):
@@ -35,6 +46,7 @@ def remove_non_ascii(text):
     Removes non Ascii characters from a string
     """
     return ''.join([i if ord(i) < 128 else '' for i in text])
+
 
 def cleanhtml(raw_html):
     """
@@ -74,33 +86,37 @@ def get_categories():
 
     resp = requests.get('https://www.crossroads.net/proxy/content/api/series')
     data = resp.json()['series']
-    #for series in data:
-        #print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
+    # for series in data:
+    #print('{} {}'.format(series['id'], remove_non_ascii(series['title'])))
     return data
 
-def get_live_streams():
-    """
-    Gets the list of current and upcoming live Streams
-    """
-    resp = requests.get("{}broadcaster/{}/events".format(_streamspot_url, _streamspot_ssid))
-    events = resp.json
+def get_broadcaster():
+    resp = requests.get('{}broadcaster/{}?players=true'.format(_streamspot_url, _streamspot_ssid), headers=_streamspot_header)
+    return resp.json()['data']['broadcaster']
+
+def get_broadcaster_stream_link(broadcaster):
+    return broadcaster['live_src']['hls']
 
 def show_main_menu():
     """
     Create the initial interface for past or live series.
     """
-    #Live
-    list_item_live = xbmcgui.ListItem(label='Live Streams')
-    list_item_live.setInfo('video', {'title': 'Live Streams'})
-    url_live = get_url(action='live')
-    xbmcplugin.addDirectoryItem(_handle, url_live, list_item_live, True)
+    broadcaster = get_broadcaster()
 
-    #Historical
+    if broadcaster['isBroadcasting']:
+        # Live
+        list_item_live = xbmcgui.ListItem(label='STREAMING NOW!')
+        list_item_live.setInfo('video', {'title': 'STREAMING NOW!'})
+        url_live = get_url(action='play', video=get_broadcaster_stream_link(broadcaster))
+        xbmcplugin.addDirectoryItem(_handle, url_live, list_item_live, False)
+
+    # Historical
     list_item_past = xbmcgui.ListItem(label='Past Series')
     list_item_past.setInfo('video', {'title': 'Past Series'})
     url_past = get_url(action='historical')
     xbmcplugin.addDirectoryItem(_handle, url_past, list_item_past, True)
     xbmcplugin.endOfDirectory(_handle)
+
 
 def list_categories():
     """
@@ -110,8 +126,8 @@ def list_categories():
     categories = get_categories()
     # Iterate through categories
     for category in categories:
-        #print(category)
-        #print(category['image'])
+        # print(category)
+        # print(category['image'])
         # Create a list item with a text label and a thumbnail image.
         list_item = xbmcgui.ListItem(label=category['title'])
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
@@ -155,8 +171,7 @@ def list_videos(series):
     :param messages: Array of messages
     :type messages: json
     """
-    #print series
-    series = ast.literal_eval(cleanhtml(series).replace('u\'', '\''))
+    # print series
 
     # Iterate through videos.
     for message in series['messages']:
@@ -193,11 +208,48 @@ def list_videos(series):
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(_handle)
 
-def list_live_streams():
-    """
-    lists all current and upcoming streams
-    """
 
+# def list_live_streams():
+#     """
+#     lists all current and upcoming streams
+#     """
+#     streamlist = get_upcoming_streams()
+
+#     for stream in streamlist:
+#         print stream
+#         if stream['upcoming']:
+#             stream['title'] = stream['title'] + ' - live on DATE'
+#         if stream['live']:
+#             stream['title'] = stream['title'] + ' - LIVE NOW'
+#         list_item = xbmcgui.ListItem(label=stream['title'])
+#         # Set additional info for the list item.
+#         list_item.setInfo(
+#             'video', {'title': stream['title'], 'genre': 'live stream'})
+#         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
+#         # Here we use the same image for all items for simplicity's sake.
+#         # In a real-life plugin you need to set each image accordingly.
+#         # list_item.setArt({'thumb': message['messageVideo']['still']['filename'],
+#         #                   'icon': message['messageVideo']['still']['filename'],
+#         #                   'fanart': series['image']['filename']})
+#         # Set 'IsPlayable' property to 'true'.
+#         # This is mandatory for playable items!
+#         list_item.setProperty('IsPlayable', 'true')
+#         # Create a URL for a plugin recursive call.
+#         # Example:
+#         # plugin://plugin.video.example/?action=play&video=http://www.vidsplay.com/vids/crab.mp4
+#         url = get_url(action='play',
+#                       video='https://player2.streamspot.com/?playerId=2887fba1')
+#         #url = ''
+#         # Add the list item to a virtual Kodi folder.
+#         # is_folder = False means that this item won't open any sub-list.
+#         is_folder = False
+#         # Add our item to the Kodi virtual folder listing.
+#         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
+#     # Add a sort method for the virtual folder items (alphabetically, ignore
+#     # articles)
+#     xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+#     # Finish creating a virtual folder.
+#     xbmcplugin.endOfDirectory(_handle)
 
 
 def play_video(path):
@@ -207,8 +259,10 @@ def play_video(path):
     :param path: Fully-qualified video URL
     :type path: str
     """
+    
+    print 'playyyyyying now'
     # Create a playable item with a path to play.
-    play_item = xbmcgui.ListItem(path=urlresolver.resolve(path))
+    play_item = xbmcgui.ListItem(path=path)
     # Pass the item to the Kodi player.
     xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
 
@@ -221,6 +275,7 @@ def router(paramstring):
     :param paramstring: URL encoded plugin paramstring
     :type paramstring: str
     """
+    
     # Parse a URL-encoded paramstring to the dictionary of
     # {<parameter>: <value>} elements
     params = dict(parse_qsl(paramstring))
@@ -234,8 +289,6 @@ def router(paramstring):
             play_video(params['video'])
         elif params['action'] == 'historical':
             list_categories()
-        elif params['live'] == 'live':
-            list_live_streams()
         else:
             # If the provided paramstring does not contain a supported action
             # we raise an exception. This helps to catch coding errors,
