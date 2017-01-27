@@ -25,8 +25,8 @@ cache = StorageServer.StorageServer("crossroads", 1)
 
 # Streamspot
 _streamspot_url = 'https://api.streamspot.com/'
-_streamspot_api_key = 'a0cb38cb-8146-47c2-b11f-6d93f4647389'
-_streamspot_ssid = 'crossr30e3'
+_streamspot_api_key = '82437b4d-4e38-42e2-83b6-148fcfaf36fb'
+_streamspot_ssid = 'crossr4915'
 _streamspot_header = {
     "Content-Type": 'application/json',
     "x-API-Key": _streamspot_api_key
