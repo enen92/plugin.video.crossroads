@@ -16,7 +16,7 @@ provider-name="CRDS">
 </extension>
 <extension point="xbmc.addon.metadata">
   <summary lang="en">Crossroads Church</summary>
-  <description lang="en">This plug provides access to live crossroads streams and past services. 
+  <description lang="en">This plugin provides access to live crossroads streams and past services. 
 We started this church for our friends who didn't like church.
 Crossroads is for anyone who wants to seek God-from those exploring whether or not God even exists, to committed Christ-followers. 
 We present biblical truths and show how they apply to our everyday lives. And we have a lot of fun while doing it.</description>
