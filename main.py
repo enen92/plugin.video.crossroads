@@ -138,7 +138,7 @@ def list_categories():
     # Iterate through categories
     for category in categories:
         # Create a list item with a text label and a thumbnail image.
-        list_item = xbmcgui.ListItem(label=category['title'])
+        list_item = xbmcgui.ListItem(label=category['startDate'][5:] + ' ' + category['title'])
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         list_item.setArt({'thumb': category['image']['filename'],
                           'icon': category['image']['filename'],
