@@ -185,8 +185,10 @@ def list_videos(series):
         list_item = xbmcgui.ListItem(label=message['title'])
         # Set additional info for the list item.
         list_item.setInfo('video',
-                          {'title': message['title'],
-                           'genre': 'message', 'plot': message['description']})
+                          {'title': message['date'][5:] + ' ' + message['title'],
+                           'genre': 'message', 'plot': message['description'],
+                           'premiered': message.get('date', ""),
+                           'dateadded': message.get('date', "")})
         # Set graphics (thumbnail, fanart, banner, poster, landscape etc.) for the list item.
         if 'messageVideo' in message and 'still' in message['messageVideo']:
             imagesrc = message['messageVideo']['still']['filename']
@@ -217,7 +219,7 @@ def list_videos(series):
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
     # Add a sort method for the virtual folder items (alphabetically, ignore
     # articles)
-    xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_LABEL_IGNORE_THE)
+    xbmcplugin.addSortMethod(_handle, xbmcplugin.SORT_METHOD_DATEADDED)
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(_handle)
 
