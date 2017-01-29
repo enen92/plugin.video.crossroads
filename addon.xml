@@ -35,6 +35,8 @@ We present biblical truths and show how they apply to our everyday lives. And we
     <screenshot>resources\screenshot-03.jpg</screenshot>  
   </assets>
   <news>v1.0.0  (2017-1-27)
-- First version of Crossroads Stream Addon!</news>
+- First version of Crossroads Stream Addon!
+- Added ability to stream live service if there is a stream active
+- Added ability to watch previous services</news>
 </extension>
 </addon>
