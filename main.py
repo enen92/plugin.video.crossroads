@@ -107,15 +107,22 @@ def show_main_menu():
 
     if broadcaster['isBroadcasting']:
         # Live
-        list_item_live = xbmcgui.ListItem(label='Watch live stream now')
-        list_item_live.setInfo('video', {'title': 'Watch live stream now', 'plot': """Live Streams:
+        streamlabel = 'Watch live stream now'
+        list_item_live = xbmcgui.ListItem(label=streamlabel)
+        url_live = get_url(action='play', video=get_broadcaster_stream_link(broadcaster))
+    else:
+        streamlabel = 'No live stream is currently broadcasting. Check back later'
+        list_item_live = xbmcgui.ListItem(label=streamlabel)
+        url_live = ''
+
+    list_item_live.setInfo('video', {'title': streamlabel, 'plot': """Live Streams:
 SAT 4:30 & 6:15pm 
 SUN 8:30, 10:05 & 11:55am (EST)"""})
-        list_item_live.setArt({'thumb': liveicon,
-                               'icon': liveicon,
-                               'fanart': fanart})
-        url_live = get_url(action='play', video=get_broadcaster_stream_link(broadcaster))
-        xbmcplugin.addDirectoryItem(_handle, url_live, list_item_live, False)
+    list_item_live.setArt({'thumb': liveicon,
+                           'icon': liveicon,
+                           'fanart': fanart})
+
+    xbmcplugin.addDirectoryItem(_handle, url_live, list_item_live, False)
 
     # Historical
     list_item_past = xbmcgui.ListItem(label='Past Series')
