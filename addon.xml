@@ -1,7 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.crossroads"
 version="1.0.0"
-name="Crossroads Church"
+name="Crossroads Anywhere"
 provider-name="CRDS">
 <requires>
   <import addon="xbmc.python" version="2.25.0"/>
@@ -15,7 +15,7 @@ provider-name="CRDS">
   <provides>video</provides>
 </extension>
 <extension point="xbmc.addon.metadata">
-  <summary lang="en">Crossroads Church</summary>
+  <summary lang="en">Crossroads Anywhere</summary>
   <description lang="en">This plugin provides access to live crossroads streams and past services. 
 We started this church for our friends who didn't like church.
 Crossroads is for anyone who wants to seek God-from those exploring whether or not God even exists, to committed Christ-followers. 
@@ -28,15 +28,12 @@ We present biblical truths and show how they apply to our everyday lives. And we
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
-    <icon>resources\media\pastseries.png</icon>
-    <icon>resources\media\streaming.png</icon>
     <screenshot>resources\screenshot-01.jpg</screenshot>
     <screenshot>resources\screenshot-02.jpg</screenshot>
     <screenshot>resources\screenshot-03.jpg</screenshot>  
   </assets>
-  <news>v1.0.0  (2017-1-27)
-- First version of Crossroads Stream Addon!
-- Added ability to stream live service if there is a stream active
-- Added ability to watch previous services</news>
+  <news>v1.0.1  (2017-2-17)
+- Rebranded to Crossroads Anwhere
+- Some icon fixes.</news>
 </extension>
 </addon>
