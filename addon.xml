@@ -1,12 +1,10 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <addon id="plugin.video.crossroads"
-version="1.0.0"
-name="Crossroads Anywhere"
+version="1.0.2"
+name="Crossroads Church"
 provider-name="CRDS">
 <requires>
   <import addon="xbmc.python" version="2.25.0"/>
-  <import addon="script.module.urlresolver" version="2.10.0" />
-  <import addon="script.module.metahandler" version="1.0.0" />
   <import addon="script.module.requests" version="2.7.0" />
   <import addon="plugin.video.youtube" version="5.3.6"/>
   <import addon="script.common.plugin.cache" version="2.5.8"/>
@@ -15,7 +13,7 @@ provider-name="CRDS">
   <provides>video</provides>
 </extension>
 <extension point="xbmc.addon.metadata">
-  <summary lang="en">Crossroads Anywhere</summary>
+  <summary lang="en">Crossroads Church</summary>
   <description lang="en">This plugin provides access to live crossroads streams and past services. 
 We started this church for our friends who didn't like church.
 Crossroads is for anyone who wants to seek God-from those exploring whether or not God even exists, to committed Christ-followers. 
@@ -25,15 +23,18 @@ We present biblical truths and show how they apply to our everyday lives. And we
   <website>https://www.crossroads.net</website>
   <email>support@crossroads.net</email>
   <source>https://github.com/crdschurch/plugin.video.crossroads</source>
+  <platform>all</platform>
+  <language>en</language>
   <assets>
     <icon>icon.png</icon>
     <fanart>fanart.jpg</fanart>
-    <screenshot>resources\screenshot-01.jpg</screenshot>
-    <screenshot>resources\screenshot-02.jpg</screenshot>
-    <screenshot>resources\screenshot-03.jpg</screenshot>  
+    <screenshot>resources/screenshot-01.jpg</screenshot>
+    <screenshot>resources/screenshot-02.jpg</screenshot>
+    <screenshot>resources/screenshot-03.jpg</screenshot>  
   </assets>
-  <news>v1.0.1  (2017-2-17)
-- Rebranded to Crossroads Anwhere
-- Some icon fixes.</news>
+  <news>v1.0.2  (2018-4-16)
+- Removed unused dependencies
+- Use updated youtube plugin path for playback
+  </news>
 </extension>
 </addon>

@@ -11,7 +11,6 @@ import xbmc
 import xbmcgui
 import xbmcplugin
 import os
-import urlresolver
 import requests
 import re
 import ast
@@ -107,22 +106,15 @@ def show_main_menu():
 
     if broadcaster['isBroadcasting']:
         # Live
-        streamlabel = 'Watch live stream now'
-        list_item_live = xbmcgui.ListItem(label=streamlabel)
-        url_live = get_url(action='play', video=get_broadcaster_stream_link(broadcaster))
-    else:
-        streamlabel = 'No live stream is currently broadcasting. Check back later'
-        list_item_live = xbmcgui.ListItem(label=streamlabel)
-        url_live = ''
-
-    list_item_live.setInfo('video', {'title': streamlabel, 'plot': """Live Streams:
+        list_item_live = xbmcgui.ListItem(label='Watch live stream now')
+        list_item_live.setInfo('video', {'title': 'Watch live stream now', 'plot': """Live Streams:
 SAT 4:30 & 6:15pm 
 SUN 8:30, 10:05 & 11:55am (EST)"""})
-    list_item_live.setArt({'thumb': liveicon,
-                           'icon': liveicon,
-                           'fanart': fanart})
-
-    xbmcplugin.addDirectoryItem(_handle, url_live, list_item_live, False)
+        list_item_live.setArt({'thumb': liveicon,
+                               'icon': liveicon,
+                               'fanart': fanart})
+        url_live = get_url(action='play', video=get_broadcaster_stream_link(broadcaster))
+        xbmcplugin.addDirectoryItem(_handle, url_live, list_item_live, False)
 
     # Historical
     list_item_past = xbmcgui.ListItem(label='Past Series')
@@ -167,7 +159,8 @@ def list_categories():
         is_folder = True
         # Add context Menu Option for trailer if it exists
         if category['trailerLink'] != None:
-            traileurl = urlresolver.resolve(category['trailerLink'])
+            traileurl = resolve_youtube_video(category['trailerLink'])
+            print traileurl
             list_item.addContextMenuItems([('Play Trailer', 'PlayMedia(' + traileurl + ')')])
         # Add our item to the Kodi virtual folder listing.
         xbmcplugin.addDirectoryItem(_handle, url, list_item, is_folder)
@@ -177,6 +170,19 @@ def list_categories():
     # Finish creating a virtual folder.
     xbmcplugin.endOfDirectory(_handle)
 
+def resolve_youtube_video(url):
+    """
+    Resolve a youtube url into a Kodi playable plugin:// path
+
+    :return: The playable plugin:// path
+    :rtype: str
+    """
+    url_patterns = ['(?:youtu.be/|/embed/|/v/|v=)(?P<video_id>[a-zA-Z0-9_\-]{11})']
+    for pattern in url_patterns:
+        v_id = re.search(pattern, url)
+        if v_id:
+            return 'plugin://plugin.video.youtube/play/?video_id={}'.format(v_id.group('video_id'))
+    return ''
 
 def list_videos(series):
     """
@@ -238,13 +244,13 @@ def play_video(path):
     :type path: str
     """
 
-    if path[-4:] == 'm3u8':
-        xbmc.Player().play(path)
-    else:
-        # Create a playable item with a path to play.
-        play_item = xbmcgui.ListItem(path=urlresolver.resolve(path))
-        # Pass the item to the Kodi player.
-        xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
+    if path[-4:] != 'm3u8':
+        path = resolve_youtube_video(path)
+        
+    # Create a playable item with a path to play.
+    play_item = xbmcgui.ListItem(path=path)
+    # Pass the item to the Kodi player.
+    xbmcplugin.setResolvedUrl(_handle, True, listitem=play_item)
 
 
 def router(paramstring):
